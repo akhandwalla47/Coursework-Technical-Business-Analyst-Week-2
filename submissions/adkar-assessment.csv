@@ -1,0 +1,30 @@
+
+Bank Customers, 
+Low — Customers know they owe money but do not know a digital payment portal exists (SN-017)., 
+High (~40%) — Strong desire among digitally capable customers to resolve debt discreetly (SN-001, SN-099).,
+Medium — Customers have some knowledge of the digital payment portal but may need guidance to use it effectively (SN-045).,
+Medium — Customers may have the ability to use the digital payment portal but could face challenges without support (SN-078).,
+Low — Reinforcement is needed to ensure customers continue using the digital payment portal after initial adoption (SN-032).,
+Low Portal Adoption: Customers continue calling phone lines due to lack of portal awareness (SN-017).,
+Embed portal links and QR codes into all SMS, email, and IVR collections notices.,
+Scope Requirement: Build automated SMS/email receipt and confirmation engines into Phase 1.
+
+Collections Representatives,
+High — Fully aware of current process failures, spreadsheet bloat (SN-025), and fragmented trails (SN-008).,
+Medium-Low — Want better tools (SN-034) but fear job loss (SN-097) or being flooded with broken portal hand-offs (SN-108).,
+Low-Medium — Need training on how the portal triages work and how routed cases appear in their queues.,
+High — Highly skilled with creative domain workarounds (SN-013); ability rises once system friction is removed.,
+High — Need to see that the portal genuinely reduces admin without changing performance KPIs.,
+Portal Rejection & Bypassing: Reps reject routed cases that lack context (SN-108) or fear job replacement (SN-097).,
+Provide targeted training and support to help reps navigate the portal effectively and reduce bypassing incidents.,
+Scope Requirement: Make the portal simple and easy to navigate, with instructions on how to use it.
+
+Operations Managers & Team Leaders,
+High — High awareness of queue entanglement (SN-029), lost shift hand-offs (SN-040), and broken reporting (SN-012).,
+High — Eager to eliminate manual reconciliation and regain visibility over true pipeline status.,
+Medium — Need full understanding of automated triage rules, hardship gateways, and SLA metrics (ie. speed and efficiency of the service).,
+Medium — Constrained by legacy reporting limits; ability depends on the ease of the new real-time operational dashboards.,
+High — Require auditable, real-time reporting to verify savings and recovery metrics to Finance (SN-031).,
+Operational Instability & Bypassed Rules: Managers fear a complex or brittle portal will create more work for teams (SN-004).,
+Strict Boundary Gateways: Establish explicit triage rules and hardship exit gates to keep complex cases human-led.,
+Scope Requirement: Build automated queue triage and real-time operational reporting dashboards into Phase 1.
