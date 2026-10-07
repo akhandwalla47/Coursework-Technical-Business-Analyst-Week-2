@@ -54,9 +54,8 @@ Deliverable 4: Clickable Prototype & Briefing Deck | Thursday, 8 Oct | 3.5 hours
 Record what must be true for this scope to work.
 
 - Legacy database records required for basic account summary and balance checks are accessible enough to support real-time lookup during Phase 1.
-- Eligibility rules for 3–6 month self-service payment plans can be agreed with Finance and Operations without requiring a full credit policy redesign.
-- Phased Rollout Support: Operations leadership will support a phased rollout, starting with a limited pilot on straightforward, early-stage delinquent accounts (1–29 days past due).
-- Messaging Triggers: Outbound communication channels (SMS and email) can be triggered automatically to send customers secure portal access links and instant receipts.  
+- Operations leadership will support a phased rollout, starting with a limited pilot on straightforward, early-stage delinquent accounts (1–29 days past due).
+- Outbound communication channels (SMS and email) can be triggered automatically to send customers secure portal access links and instant receipts.  
 
 ## Dependencies and constraints
 
@@ -65,7 +64,7 @@ Note the most important delivery and operating constraints.
 - Real-time balance checks depend on reliable API data retrieval from the bank's core legacy database without introducing system latency.
 - All customer-facing portal text, payment plan terms, and automated confirmation messages require formal compliance sign-off prior to launch (SN-019).
 - Routed cases must automatically attach full portal session logs so representatives do not make customers repeat information (SN-036, SN-108).
-- The delivery schedule is restricted to a tight Phase 1 development window with capped starter capital (£260,000 total investment). 
+- The delivery schedule is restricted to a tight Phase 1 development window with fixed budget (£260,000 total investment). 
 
 ## Why this scope is credible
 
