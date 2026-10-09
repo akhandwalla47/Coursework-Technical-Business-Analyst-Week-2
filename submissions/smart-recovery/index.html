@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legacy Trust Smart-Recovery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50: '#eef4fb', 100: '#d6e4f5', 600: '#1f4e8c', 700: '#173d6e', 900: '#0d2342' }, gold: '#b8924a' } } }
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col">
+
+  <!-- Persistent header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-lg bg-brand-700 flex items-center justify-center text-white" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8"/><path d="M3 21h18"/></svg>
+        </div>
+        <div class="leading-tight">
+          <p class="text-lg font-semibold text-brand-900">Legacy Trust</p>
+          <p class="text-xs font-medium tracking-wide text-gold uppercase">Smart-Recovery</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-sm text-slate-500">
+        <span id="session-badge" class="hidden items-center gap-1 rounded-full bg-green-50 text-green-700 px-3 py-1 text-xs font-medium">
+          <span class="h-2 w-2 rounded-full bg-green-500"></span> Verified session
+        </span>
+        <button type="button" data-goto="routed" class="text-brand-600 hover:underline font-medium">Need help?</button>
+      </div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 pb-3">
+      <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+        <span id="step-label"></span>
+        <span id="step-count"></span>
+      </div>
+      <div class="h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
+        <div id="progress" class="h-full bg-brand-600 transition-all duration-300" style="width:0%"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
+
+    <!-- Screen 1: Landing page -->
+    <section id="landing" data-screen data-label="Sign in">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[VER-01]</span>
+        <h1 class="text-3xl font-semibold text-brand-900 pr-20">Get your account back on track</h1>
+        <p class="mt-2 text-slate-600 max-w-xl">Check your balance and choose a repayment option in a few minutes, without waiting on the phone. Enter your details to begin.</p>
+        <form id="landing-form" class="mt-6 grid gap-4 sm:grid-cols-2 max-w-xl" novalidate>
+          <div>
+            <label for="acct-ref" class="block text-sm font-medium">Account reference</label>
+            <input id="acct-ref" autocomplete="off" placeholder="e.g. LT-48201937" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none">
+          </div>
+          <div>
+            <label for="dob" class="block text-sm font-medium">Date of birth</label>
+            <input id="dob" type="date" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none">
+          </div>
+          <p id="landing-error" class="hidden sm:col-span-2 text-sm text-red-600" role="alert"></p>
+          <div class="sm:col-span-2 flex flex-wrap items-center gap-4">
+            <button type="submit" class="rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">Continue</button>
+            <button type="button" data-goto="routed" class="text-sm text-brand-600 hover:underline">Speak to a representative instead</button>
+          </div>
+        </form>
+        <p class="mt-5 text-xs text-slate-500">No account details are shown until you complete verification.</p>
+      </div>
+    </section>
+
+    <!-- Screen 2: 2FA OTP verification -->
+    <section id="otp" data-screen data-label="Verify one-time code" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[VER-01]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-20">Enter your one-time code</h2>
+        <p class="mt-1 text-slate-600">We've sent a 6-digit code by SMS to <span class="font-medium">+44 •••• ••1234</span>. It expires in 2 minutes.</p>
+        <div class="mt-4 max-w-xs" role="timer">
+          <div class="flex items-center justify-between text-sm">
+            <span id="otp-countdown-label" class="text-slate-600">Code expires in</span>
+            <span id="otp-countdown-time" class="font-mono font-semibold text-brand-900">2:00</span>
+          </div>
+          <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200">
+            <div id="otp-countdown-bar" class="h-full w-full bg-brand-600 transition-[width] duration-1000 ease-linear"></div>
+          </div>
+        </div>
+        <form id="otp-form" class="mt-6 max-w-xs space-y-4" novalidate>
+          <div>
+            <label for="otp-code" class="block text-sm font-medium">6-digit code</label>
+            <input id="otp-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-xl tracking-[0.5em] focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none">
+          </div>
+          <p id="otp-error" class="hidden text-sm text-red-600" role="alert"></p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button type="submit" id="otp-submit" class="rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed">Submit 2FA</button>
+            <button type="button" id="otp-resend" class="text-sm text-brand-600 hover:underline">Resend code</button>
+          </div>
+          <p id="otp-resent" class="hidden text-xs text-green-700">A new code has been sent.</p>
+        </form>
+        <div class="mt-6 max-w-md rounded-lg border border-dashed border-slate-300 p-3">
+          <p class="text-xs text-slate-500">Prototype controls: enter any 6-digit code to continue, or <span class="font-mono">0000</span> to simulate a failed verification.</p>
+          <button type="button" id="otp-simulate-fail" class="mt-2 rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">Simulate 3 Failed Attempts</button>
+        </div>
+        <button type="button" data-goto="landing" class="mt-4 text-sm text-slate-600 hover:underline">Back</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Account summary -->
+    <section id="summary" data-screen data-label="Account summary" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[VIS-01]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-20">Your account summary</h2>
+        <p class="mt-1 text-slate-600">Personal Loan <span id="summary-ref" class="font-mono"></span></p>
+
+        <div id="summary-loading" class="mt-6 flex items-center gap-3 text-sm text-slate-500" role="status">
+          <svg class="h-5 w-5 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+          Retrieving your balance from the legacy banking system…
+        </div>
+
+        <div id="summary-data" class="hidden">
+          <dl class="mt-6 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-xl bg-slate-100 p-4"><dt class="text-xs uppercase tracking-wide text-slate-600">Outstanding balance</dt><dd class="mt-1 text-2xl font-semibold">£1,250.00</dd></div>
+            <div class="rounded-xl bg-red-50 p-4"><dt class="text-xs uppercase tracking-wide text-red-700">Overdue amount</dt><dd class="mt-1 text-2xl font-semibold text-red-800">£210.00</dd></div>
+            <div class="rounded-xl bg-amber-50 p-4"><dt class="text-xs uppercase tracking-wide text-amber-700">Status</dt><dd class="mt-1 text-2xl font-semibold text-amber-800">18 days overdue</dd></div>
+          </dl>
+          <p class="mt-3 text-xs text-slate-500">Source: Legacy core banking database. Last retrieved <span id="retrieved-at"></span>.</p>
+          <button type="button" data-goto="actions" class="mt-6 rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700">See my options</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 4: Action choices -->
+    <section id="actions" data-screen data-label="Choose an option" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[PAY-01 / VIS-01]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-36">How would you like to proceed?</h2>
+        <p class="mt-1 text-slate-600">Choose the option that suits your situation.</p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <button type="button" data-goto="payfull" class="text-left rounded-xl border border-slate-200 p-5 hover:border-brand-600 hover:bg-brand-50">
+            <p class="font-semibold text-brand-900">Pay in Full (£1,250.00)</p>
+            <p class="mt-1 text-sm text-slate-600">Settle your whole balance today and close the case.</p>
+          </button>
+          <button type="button" data-goto="plans" class="text-left rounded-xl border border-slate-200 p-5 hover:border-brand-600 hover:bg-brand-50">
+            <p class="font-semibold text-brand-900">Set Up Payment Plan (3–6 Months)</p>
+            <p class="mt-1 text-sm text-slate-600">Spread your balance over monthly instalments.</p>
+          </button>
+          <button type="button" data-goto="promise" class="text-left rounded-xl border border-slate-200 p-5 hover:border-brand-600 hover:bg-brand-50">
+            <p class="font-semibold text-brand-900">Promise to Pay Later</p>
+            <p class="mt-1 text-sm text-slate-600">Can't pay today? Pick a date you'll make a payment.</p>
+          </button>
+          <button type="button" data-escalate="hardship" class="text-left rounded-xl border border-slate-200 p-5 hover:border-brand-600 hover:bg-brand-50">
+            <p class="font-semibold text-brand-900">Financial Hardship / Balance Dispute</p>
+            <p class="mt-1 text-sm text-slate-600">Talk to a specialist about support or a balance you think is wrong.</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 4b: Pay in full -->
+    <section id="payfull" data-screen data-label="Pay in full" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[PAY-01]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-20">Pay your balance in full</h2>
+        <p class="mt-1 text-slate-600">Paying today settles your account and closes the case.</p>
+        <dl class="mt-6 max-w-md divide-y divide-slate-200 rounded-xl border border-slate-200 text-sm">
+          <div class="flex justify-between p-3"><dt class="text-slate-600">Overdue amount</dt><dd class="font-medium">£210.00</dd></div>
+          <div class="flex justify-between p-3"><dt class="text-slate-600">Remaining balance</dt><dd class="font-medium">£1,040.00</dd></div>
+          <div class="flex justify-between p-3 bg-slate-50"><dt class="font-semibold">Total to pay today</dt><dd class="font-semibold text-brand-900">£1,250.00</dd></div>
+        </dl>
+        <div id="payfull-form-slot" class="mt-6 max-w-xl"></div>
+        <p id="payfull-status" class="hidden mt-4 items-center gap-2 text-sm text-slate-600" role="status">
+          <svg class="h-4 w-4 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+          Processing Payment with Legacy Database…
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-4">
+          <button type="button" id="payfull-confirm" disabled class="rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed">Confirm Payment</button>
+          <button type="button" id="payfull-back" data-goto="actions" class="text-sm text-slate-600 hover:underline">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 5: Payment plan options -->
+    <section id="plans" data-screen data-label="Payment plan" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[PAY-01]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-20">Choose a payment plan</h2>
+        <p class="mt-1 text-slate-600">You're pre-approved for these plans to clear your £1,250.00 balance. No extra fees are added.</p>
+        <form id="plan-form" class="mt-6 space-y-3" novalidate>
+          <div id="plan-options" class="space-y-3"></div>
+          <p class="text-xs text-slate-500">The payment details below will be used for each monthly instalment.</p>
+          <div id="plans-form-slot" class="pt-2 max-w-xl"></div>
+          <p id="plans-status" class="hidden items-center gap-2 text-sm text-slate-600" role="status">
+            <svg class="h-4 w-4 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/></svg>
+            Processing Payment with Legacy Database…
+          </p>
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <button type="submit" id="plans-confirm" disabled class="rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed">Confirm Payment</button>
+            <button type="button" id="plans-back" data-goto="actions" class="text-sm text-slate-600 hover:underline">Back</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Screen 5b: Promise to pay -->
+    <section id="promise" data-screen data-label="Promise to pay" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[PAY-02]</span>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-20">Promise to pay</h2>
+        <p class="mt-1 text-slate-600">Tell us when you'll make a payment so we can pause further follow-up. You can choose a date up to 14 days from today.</p>
+        <form id="promise-form" class="mt-6 grid gap-4 sm:grid-cols-2 max-w-xl" novalidate>
+          <div>
+            <label for="promise-amount" class="block text-sm font-medium">Amount (£)</label>
+            <input id="promise-amount" type="number" min="1" max="1250" step="0.01" value="210.00" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none">
+            <p class="mt-1 text-xs text-slate-500">Your overdue amount is £210.00.</p>
+          </div>
+          <div>
+            <label for="promise-date" class="block text-sm font-medium">Payment date</label>
+            <input id="promise-date" type="date" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none">
+          </div>
+          <p id="promise-error" class="hidden sm:col-span-2 text-sm text-red-600" role="alert"></p>
+          <div class="sm:col-span-2 flex flex-wrap items-center gap-4">
+            <button type="submit" class="rounded-lg bg-brand-600 px-6 py-2.5 font-medium text-white hover:bg-brand-700">Confirm promise</button>
+            <button type="button" data-goto="actions" class="text-sm text-slate-600 hover:underline">Back</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Screen 6: Confirmation -->
+    <section id="confirm" data-screen data-label="Confirmation" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <span class="absolute top-4 right-4 rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[REP-01]</span>
+        <div class="flex items-center gap-4 pr-20">
+          <div class="h-12 w-12 shrink-0 rounded-full bg-green-100 text-green-600 flex items-center justify-center" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div>
+            <h2 id="confirm-title" class="text-2xl font-semibold text-brand-900"></h2>
+            <p id="confirm-summary" class="text-slate-600"></p>
+          </div>
+        </div>
+        <p id="confirm-case" class="hidden mt-4 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">Case closed and legacy database updated. Your account now shows a £0.00 balance.</p>
+        <p id="confirm-method" class="hidden mt-2 text-sm text-slate-600"></p>
+        <div class="mt-6 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-0.5 shrink-0 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <p class="text-sm text-green-900"><span class="font-semibold">Instant SMS &amp; email receipt sent</span> to +44 •••• ••1234 and your registered email address. <span id="confirm-ref-label">Reference</span> <span id="confirm-ref" class="font-mono font-semibold"></span>. Keep this message as your written record. <span class="rounded-md bg-white/70 border border-green-200 px-1.5 py-0.5 text-xs font-mono font-semibold">[REP-01]</span></p>
+        </div>
+        <button type="button" data-goto="landing" class="mt-6 rounded-lg border border-brand-600 px-6 py-2.5 font-medium text-brand-600 hover:bg-brand-50">Finish</button>
+      </div>
+    </section>
+
+    <!-- Screen 7: Escalated representative support -->
+    <section id="routed" data-screen data-label="Representative support" class="hidden">
+      <div class="relative bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <div class="absolute top-4 right-4 flex gap-1">
+          <span class="rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[RTE-01]</span>
+          <span class="rounded-md bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-mono font-semibold text-brand-700">[RTE-02]</span>
+        </div>
+        <h2 class="text-2xl font-semibold text-brand-900 pr-32">A specialist will help you</h2>
+        <p id="routed-reason" class="mt-2 text-slate-600"></p>
+        <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">Session payload logged and routed to representative queue [RTE-02]</p>
+        <div class="mt-5 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-600 space-y-2">
+          <p><span class="font-medium text-slate-800">Case reference:</span> <span id="routed-ref" class="font-mono"></span></p>
+          <p><span class="font-medium text-slate-800">What happens next:</span> a representative will call you within 1 business day, with your session history already attached so you don't repeat yourself.</p>
+          <p><span class="font-medium text-slate-800">Prefer to call now?</span> 0800 000 0000, Monday to Friday, 8am to 6pm.</p>
+        </div>
+        <button type="button" data-goto="landing" class="mt-6 rounded-lg border border-brand-600 px-6 py-2.5 font-medium text-brand-600 hover:bg-brand-50">Return to start</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="max-w-4xl mx-auto px-4 py-4 text-xs text-slate-500">
+      Legacy Trust Smart-Recovery - course prototype. No real data is processed.
+    </div>
+  </footer>
+
+  <script>
+    const BALANCE = 1250;
+    const steps = { landing: 0, otp: 1, summary: 2, actions: 3, payfull: 4, plans: 4, promise: 4, confirm: 5 };
+    const TOTAL_STEPS = 6;
+    const verifiedScreens = ['summary', 'actions', 'payfull', 'plans', 'promise', 'confirm'];
+    const reasons = {
+      hardship: "Thank you for telling us. Whether you're facing financial difficulty or think this balance is wrong, a specialist will contact you rather than offering an online option.",
+      otp: "We couldn't verify your code, so online access has been paused to keep your account safe. A representative will help you get back in.",
+      default: "We can't complete this online, and that's okay. A representative will follow up with the details you've shared."
+    };
+    const state = { ref: '', settled: false, method: null, summaryTimer: null, payTimer: null, otpTimer: null };
+
+    const $ = id => document.getElementById(id);
+    const randomRef = prefix => `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const gbp = n => '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function show(id) {
+      document.querySelectorAll('[data-screen]').forEach(s => s.classList.toggle('hidden', s.id !== id));
+      const idx = id in steps ? steps[id] : -1;
+      $('step-label').textContent = $(id).dataset.label;
+      $('step-count').textContent = idx >= 0 ? `Step ${idx + 1} of ${TOTAL_STEPS}` : '';
+      $('progress').style.width = idx >= 0 ? `${((idx + 1) / TOTAL_STEPS) * 100}%` : '100%';
+      const verified = verifiedScreens.includes(id);
+      $('session-badge').classList.toggle('hidden', !verified);
+      $('session-badge').classList.toggle('inline-flex', verified);
+      if (id === 'summary') loadSummary();
+      if (id === 'otp') startOtpTimer(); else clearInterval(state.otpTimer);
+      // Leaving a payment screen also wipes any mock card or bank details.
+      Object.keys(PAY).forEach(resetPay);
+      if (id === 'confirm') {
+        $('confirm-case').classList.toggle('hidden', !state.settled);
+        $('confirm-method').textContent = state.method ? `Paid with: ${state.method}` : '';
+        $('confirm-method').classList.toggle('hidden', !state.method);
+        $('confirm-ref-label').textContent = state.method ? 'Transaction ID' : 'Reference';
+      }
+      window.scrollTo({ top: 0 });
+    }
+
+    function escalate(reason) {
+      $('routed-reason').textContent = reasons[reason] || reasons.default;
+      $('routed-ref').textContent = randomRef('CASE');
+      show('routed');
+    }
+
+    function fail(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+
+    // Simulates the legacy DB call so the loading state is visible.
+    function loadSummary() {
+      $('summary-ref').textContent = state.ref;
+      $('summary-loading').classList.remove('hidden');
+      $('summary-data').classList.add('hidden');
+      clearTimeout(state.summaryTimer);
+      state.summaryTimer = setTimeout(() => {
+        $('retrieved-at').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        $('summary-loading').classList.add('hidden');
+        $('summary-data').classList.remove('hidden');
+      }, 900);
+    }
+
+    document.addEventListener('click', e => {
+      const goto = e.target.closest('[data-goto]');
+      if (goto) {
+        if (goto.dataset.goto === 'routed') escalate('default'); else show(goto.dataset.goto);
+        return;
+      }
+      const esc = e.target.closest('[data-escalate]');
+      if (esc) escalate(esc.dataset.escalate);
+    });
+
+    // Screen 1
+    const MIN_AGE = 18;
+    const isAdult = iso => {
+      const [y, m, d] = iso.split('-').map(Number);
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - MIN_AGE);
+      return new Date(y, m - 1, d) <= cutoff;
+    };
+    $('dob').max = new Date().toISOString().split('T')[0];
+    $('landing-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const ref = $('acct-ref').value.trim().toUpperCase();
+      const err = $('landing-error');
+      if (!/^[A-Z0-9-]{6,14}$/.test(ref) || !$('dob').value) {
+        fail(err, 'Enter your account reference (6 to 14 letters, numbers or hyphens) and your date of birth.');
+        return;
+      }
+      if (!isAdult($('dob').value)) {
+        fail(err, `You must be ${MIN_AGE} or over to use this service. Please contact us if you think this is a mistake.`);
+        return;
+      }
+      err.classList.add('hidden');
+      state.ref = ref;
+      $('otp-code').value = '';
+      $('otp-error').classList.add('hidden');
+      show('otp');
+    });
+
+    // Screen 2
+    const OTP_SECONDS = 120;
+
+    function setOtpExpired(expired) {
+      $('otp-submit').disabled = expired;
+      $('otp-code').disabled = expired;
+      $('otp-countdown-label').textContent = expired ? 'Code expired' : 'Code expires in';
+      $('otp-resend').classList.toggle('font-semibold', expired);
+      if (expired) fail($('otp-error'), 'This code has expired. Request a new code to continue.');
+      else $('otp-error').classList.add('hidden');
+    }
+
+    function startOtpTimer() {
+      clearInterval(state.otpTimer);
+      $('otp-resent').classList.add('hidden');
+      setOtpExpired(false);
+      const end = Date.now() + OTP_SECONDS * 1000;
+      const tick = () => {
+        const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+        $('otp-countdown-time').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+        $('otp-countdown-bar').style.width = `${(left / OTP_SECONDS) * 100}%`;
+        const urgent = left <= 30;
+        $('otp-countdown-bar').classList.toggle('bg-red-500', urgent);
+        $('otp-countdown-bar').classList.toggle('bg-brand-600', !urgent);
+        $('otp-countdown-time').classList.toggle('text-red-600', urgent);
+        $('otp-countdown-time').classList.toggle('text-brand-900', !urgent);
+        if (left === 0) { clearInterval(state.otpTimer); setOtpExpired(true); }
+      };
+      tick();
+      state.otpTimer = setInterval(tick, 250);
+    }
+    $('otp-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const err = $('otp-error');
+      const code = $('otp-code').value.trim();
+      if (code === '0000') { err.classList.add('hidden'); escalate('otp'); return; }
+      if (!/^\d{6}$/.test(code)) { fail(err, 'Enter the 6-digit code from your SMS.'); return; }
+      err.classList.add('hidden');
+      show('summary');
+    });
+    $('otp-simulate-fail').addEventListener('click', () => escalate('otp'));
+    $('otp-resend').addEventListener('click', () => {
+      $('otp-code').value = '';
+      startOtpTimer();
+      $('otp-resent').classList.remove('hidden');
+      $('otp-code').focus();
+    });
+
+    // Screens 4b and 5: shared mock payment form (nothing is stored or sent).
+    const INPUT_CLS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none aria-[invalid=true]:border-red-500';
+    const PILL_CLS = 'cursor-pointer rounded-full border border-slate-300 px-4 py-1.5 text-sm font-medium has-[:checked]:border-brand-600 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600 has-[:focus-visible]:ring-offset-2';
+    const digits = v => v.replace(/\D/g, '');
+
+    const FIELDS = {
+      name: {
+        method: 'card',
+        format: v => v.replace(/[^A-Za-z .'-]/g, '').slice(0, 60),
+        check: v => (/^[A-Za-z][A-Za-z .'-]+$/.test(v.trim()) ? '' : 'Enter the name as shown on the card.')
+      },
+      card: {
+        method: 'card',
+        format: v => digits(v).slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 '),
+        check: v => (digits(v).length === 16 ? '' : 'Card number must be 16 digits.')
+      },
+      exp: {
+        method: 'card',
+        format: v => { const d = digits(v).slice(0, 4); return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d; },
+        check: v => {
+          const m = /^(\d{2})\/(\d{2})$/.exec(v);
+          if (!m) return 'Use the format MM/YY.';
+          const month = Number(m[1]), year = 2000 + Number(m[2]);
+          if (month < 1 || month > 12) return 'Month must be 01 to 12.';
+          const now = new Date();
+          const expired = year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1);
+          return expired ? 'This card has expired.' : '';
+        }
+      },
+      cvv: {
+        method: 'card',
+        format: v => digits(v).slice(0, 3),
+        check: v => (/^\d{3}$/.test(v) ? '' : 'CVV must be 3 digits.')
+      },
+      acct: {
+        method: 'bank',
+        format: v => digits(v).slice(0, 8),
+        check: v => (/^\d{8}$/.test(v) ? '' : 'Account number must be 8 digits.')
+      },
+      sort: {
+        method: 'bank',
+        format: v => digits(v).slice(0, 6).replace(/(\d{2})(?=\d)/g, '$1-'),
+        check: v => (digits(v).length === 6 ? '' : 'Sort code must be 6 digits (e.g. 12-34-56).')
+      }
+    };
+
+    const fieldHTML = (p, key, label, attrs, extra = '') => `
+      <div class="${extra}">
+        <label for="${p}-${key}" class="block text-sm font-medium">${label}</label>
+        <input id="${p}-${key}" data-field="${key}" ${attrs} class="${INPUT_CLS}">
+        <p data-error-for="${key}" class="mt-1 min-h-4 text-xs text-red-600" role="alert"></p>
+      </div>`;
+
+    function createPaymentForm(slot, p, onChange) {
+      slot.innerHTML = `
+        <fieldset class="rounded-xl border border-slate-200 p-4">
+          <legend class="px-1 text-sm font-semibold text-brand-900">Payment details</legend>
+          <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Payment method">
+            <label class="${PILL_CLS}"><input type="radio" name="${p}-method" value="card" class="sr-only" checked> Card</label>
+            <label class="${PILL_CLS}"><input type="radio" name="${p}-method" value="bank" class="sr-only"> Direct Debit / Bank Transfer</label>
+          </div>
+          <div data-panel="card" class="mt-4 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+            ${fieldHTML(p, 'name', 'Cardholder Name', 'autocomplete="cc-name" maxlength="60"', 'sm:col-span-2')}
+            ${fieldHTML(p, 'card', 'Card Number (16 digits)', 'inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000"', 'sm:col-span-2')}
+            ${fieldHTML(p, 'exp', 'Expiry Date (MM/YY)', 'inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"')}
+            ${fieldHTML(p, 'cvv', 'CVV (3 digits)', 'inputmode="numeric" autocomplete="cc-csc" placeholder="123"')}
+          </div>
+          <div data-panel="bank" class="hidden mt-4 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+            ${fieldHTML(p, 'acct', 'Account Number (8 digits)', 'inputmode="numeric" autocomplete="off" placeholder="12345678"')}
+            ${fieldHTML(p, 'sort', 'Sort Code', 'inputmode="numeric" autocomplete="off" placeholder="12-34-56"')}
+          </div>
+          <p class="mt-2 text-xs text-slate-500">Prototype only: use dummy details. Nothing is stored or sent.</p>
+        </fieldset>`;
+
+      const input = k => slot.querySelector(`[data-field="${k}"]`);
+      const method = () => slot.querySelector('input[type="radio"]:checked').value;
+      const activeKeys = () => Object.keys(FIELDS).filter(k => FIELDS[k].method === method());
+      const validate = k => (input(k).value.trim() ? FIELDS[k].check(input(k).value) : 'This field is required.');
+      const touched = new Set();
+
+      function showError(k) {
+        const msg = validate(k);
+        slot.querySelector(`[data-error-for="${k}"]`).textContent = msg;
+        input(k).setAttribute('aria-invalid', msg ? 'true' : 'false');
+      }
+      function showPanel() {
+        slot.querySelectorAll('[data-panel]').forEach(el => el.classList.toggle('hidden', el.dataset.panel !== method()));
+      }
+
+      slot.addEventListener('input', e => {
+        const k = e.target.dataset.field;
+        if (k) {
+          e.target.value = FIELDS[k].format(e.target.value);
+          if (touched.has(k)) showError(k);
+        }
+        onChange();
+      });
+      slot.addEventListener('focusout', e => {
+        const k = e.target.dataset.field;
+        if (k) { touched.add(k); showError(k); onChange(); }
+      });
+      slot.addEventListener('change', e => {
+        if (e.target.type === 'radio') { showPanel(); onChange(); }
+      });
+
+      return {
+        isValid: () => activeKeys().every(k => !validate(k)),
+        summary: () => (method() === 'card'
+          ? `Card ending ${digits(input('card').value).slice(-4)}`
+          : `Bank account ending ${input('acct').value.slice(-4)}`),
+        reset() {
+          touched.clear();
+          Object.keys(FIELDS).forEach(k => {
+            input(k).value = '';
+            input(k).removeAttribute('aria-invalid');
+            slot.querySelector(`[data-error-for="${k}"]`).textContent = '';
+          });
+          slot.querySelector('input[value="card"]').checked = true;
+          showPanel();
+        }
+      };
+    }
+
+    const PAY = {
+      payfull: {
+        ready: () => true,
+        complete() {
+          state.settled = true;
+          $('confirm-title').textContent = 'Account Settled in Full';
+          $('confirm-summary').textContent = `${gbp(BALANCE)} paid on ${state.ref}.`;
+        }
+      },
+      plans: {
+        ready: () => !!document.querySelector('input[name="plan"]:checked'),
+        complete() {
+          const months = Number(document.querySelector('input[name="plan"]:checked').value);
+          state.settled = false;
+          $('confirm-title').textContent = 'Your plan is confirmed';
+          $('confirm-summary').textContent = `${gbp(BALANCE / months)} a month for ${months} months on ${state.ref}.`;
+        }
+      }
+    };
+    const payForms = {};
+
+    function refreshPay(key) {
+      $(`${key}-confirm`).disabled = !(payForms[key].isValid() && PAY[key].ready());
+    }
+
+    function resetPay(key) {
+      clearTimeout(state.payTimer);
+      if (!payForms[key]) return;
+      payForms[key].reset();
+      if (key === 'plans') document.querySelectorAll('input[name="plan"]').forEach(r => { r.checked = false; });
+      $(`${key}-back`).disabled = false;
+      $(`${key}-status`).classList.add('hidden');
+      $(`${key}-status`).classList.remove('flex');
+      refreshPay(key);
+    }
+
+    // Simulates the legacy DB payment call.
+    function submitPayment(key) {
+      if (!payForms[key].isValid() || !PAY[key].ready()) return;
+      $(`${key}-confirm`).disabled = true;
+      $(`${key}-back`).disabled = true;
+      $(`${key}-status`).classList.remove('hidden');
+      $(`${key}-status`).classList.add('flex');
+      state.payTimer = setTimeout(() => {
+        state.method = payForms[key].summary();
+        PAY[key].complete();
+        $('confirm-ref').textContent = `TXN-${Math.floor(10000000 + Math.random() * 90000000)}`;
+        show('confirm');
+      }, 1000);
+    }
+
+    Object.keys(PAY).forEach(key => {
+      payForms[key] = createPaymentForm($(`${key}-form-slot`), key, () => refreshPay(key));
+      refreshPay(key);
+    });
+    $('payfull-confirm').addEventListener('click', () => submitPayment('payfull'));
+
+    // Screen 5b
+    const isoDay = offset => { const d = new Date(); d.setDate(d.getDate() + offset); return d.toISOString().split('T')[0]; };
+    $('promise-date').min = isoDay(1);
+    $('promise-date').max = isoDay(14);
+    $('promise-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const err = $('promise-error');
+      const amount = parseFloat($('promise-amount').value);
+      const date = $('promise-date').value;
+      if (!(amount >= 1 && amount <= BALANCE)) { fail(err, `Enter an amount between £1.00 and ${gbp(BALANCE)}.`); return; }
+      if (!date || date < $('promise-date').min || date > $('promise-date').max) { fail(err, 'Choose a payment date within the next 14 days.'); return; }
+      err.classList.add('hidden');
+      const pretty = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      state.settled = false;
+      state.method = null;
+      $('confirm-title').textContent = 'Your promise is recorded';
+      $('confirm-summary').textContent = `${gbp(amount)} on ${pretty} for ${state.ref}.`;
+      $('confirm-ref').textContent = randomRef('PTP');
+      show('confirm');
+    });
+
+    // Screen 5
+    $('plan-options').innerHTML = [3, 4, 5, 6].map(m => `
+      <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4 cursor-pointer has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50">
+        <span class="flex items-center gap-3">
+          <input type="radio" name="plan" value="${m}" class="accent-brand-600">
+          <span class="font-medium">${m} months</span>
+        </span>
+        <span class="text-right"><span class="font-semibold text-brand-900">${gbp(BALANCE / m)}</span> <span class="text-sm text-slate-500">per month</span></span>
+      </label>`).join('');
+
+    $('plan-options').addEventListener('change', () => refreshPay('plans'));
+    $('plan-form').addEventListener('submit', e => {
+      e.preventDefault();
+      submitPayment('plans');
+    });
+
+    show('landing');
+  </script>
+</body>
+</html>

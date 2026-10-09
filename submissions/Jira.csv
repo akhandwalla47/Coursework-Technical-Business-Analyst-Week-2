@@ -1,0 +1,224 @@
+Summary,Issue key,Issue id,Issue Type,Status,Project key,Project name,Project type,Project lead,Project lead id,Project description,Priority,Resolution,Assignee,Assignee Id,Reporter,Reporter Id,Creator,Creator Id,Created,Updated,Last Viewed,Resolved,Due date,Votes,Description,Environment,Watchers,Watchers Id,Original estimate,Remaining Estimate,Time Spent,Work Ratio,Σ Original Estimate,Σ Remaining Estimate,Σ Time Spent,Security Level,Custom field (Development),Custom field (Issue color),Custom field (Rank),Sprint,Custom field (Start date),Custom field (Story point estimate),Custom field (Team),Custom field (Vulnerability),Parent,Parent key,Parent summary,Status category,Status category changed
+Story VER-01: Customer 2FA Authentication ,SCRUM-1,10000,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,07/Oct/26 5:31 PM,08/Oct/26 11:48 AM,08/Oct/26 11:48 AM,,12/Oct/26 12:00 AM,0,"*User Story:* As a delinquent account customer, I want to sign into my portal securely using 2-Factor Authentication (Date of Birth + SMS/Email OTP), so that I can access my account balance safely without exposing personal financial data.
+
+
+
+*Business Value:* Ensures FCA data privacy compliance and prevents unauthorized portal access while replacing manual security checks.
+
+
+
+*Acceptance Criteria:*
+
+*Given* a customer enters their account reference and Date of Birth on the portal landing page,
+
+*When* they request verification, 
+
+*Then* the system sends a 6-digit One-Time Password (OTP) via SMS/email using the registered contact details within 10 seconds.
+
+*Given* a customer enters a valid OTP,
+
+*When* verified against the system token,
+
+*Then* the session is authenticated and redirects to the Account Summary screen.
+
+*Given* a customer enters an incorrect OTP 3 consecutive times,
+
+*When* the 3rd attempt fails, 
+
+*Then* the portal locks self-service access, displays a security lockout screen, and routes a security follow-up task to the Representative queue.
+
+
+
+*Dependencies:* Legacy Collections Database API (for contact detail retrieval), Outbound Messaging Gateway (SMS/Email).
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|hzzzzz:,SCRUM Sprint 0,,,,,10004,SCRUM-5,Epic 1: Access & Identity Verification (VER),To Do,07/Oct/26 5:31 PM
+Epic 1: Access & Identity Verification (VER),SCRUM-5,10004,Epic,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,07/Oct/26 5:39 PM,08/Oct/26 11:49 AM,08/Oct/26 12:08 PM,,,0,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},purple,0|i0000n:,,,,,,,,,To Do,07/Oct/26 5:39 PM
+Story VIS-01: Real-Time Balance & Delinquency Status Display,SCRUM-6,10037,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 10:59 AM,08/Oct/26 11:39 AM,08/Oct/26 11:37 AM,,,0,"**User Story:** As an authenticated customer, I want to view my current outstanding balance, overdue amount, and delinquency status, so that I can understand my exact financial obligation without calling a representative.
+
+
+
+**Business Value:** Directly eliminates routine `view_status` and `spreadsheet_reconcile` representative tasks (BM-16 = 2,468 view status actions).
+
+
+
+**Acceptance Criteria:**
+
+**Given** an authenticated customer session begins,
+
+**When** the Account Summary page loads,
+
+**Then** the portal displays total balance, overdue amount, days past due (DPD), and current account status retrieved from the Legacy Database.
+
+**Given** a database connection delay exceeds 3 seconds,
+
+**When** loading balance details,
+
+**Then** the portal displays a friendly loading state and fallback retry option without crashing.
+
+
+
+**Dependencies:** Legacy Collections Database Read API (Epic 1).
+
+
+
+**Priority:** High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i00012:,SCRUM Sprint 0,,,,,10038,SCRUM-7,Epic 2: Account Visibility & Summary (VIS),To Do,08/Oct/26 10:59 AM
+Epic 2: Account Visibility & Summary (VIS),SCRUM-7,10038,Epic,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:07 AM,08/Oct/26 11:48 AM,08/Oct/26 11:48 AM,,,0,,,,,,,,,,,,,{},blue,0|i00019:,,,,,,,,,To Do,08/Oct/26 11:07 AM
+Story PAY-01: Pre-Approved Payment Plan Selection,SCRUM-8,10039,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:09 AM,08/Oct/26 11:37 AM,08/Oct/26 11:37 AM,,,0,"*User Story:* As an early-stage delinquent customer (1–29 DPD), I want to select a pre-approved 3–6 month installment plan, so that I can clear my debt at an affordable pace.
+
+
+
+*Business Value:* Drives self-service debt resolution for 38% of accounts (BM-02), unlocking £3.84M in annual recovery uplift (FA-07).
+
+
+
+*Acceptance Criteria:*
+
+*Given* an eligible customer viewing their account summary,
+
+*When* they select ""Set Up Payment Plan"",
+
+*Then* the portal presents pre-calculated 3, 4, 5, and 6-month monthly installment options.
+
+*Given* a customer selects a plan duration and confirms,
+
+*When* submitted,
+
+*Then* the portal logs the active agreement in the Legacy Database, schedules recurring payment reminders, and generates a downloadable PDF summary.
+
+
+
+*Dependencies:* Epic 2, Legacy Collections Database Write API.
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i0001n:,SCRUM Sprint 0,,,,,10040,SCRUM-9,Epic 3: Payment Plan & Promise-to-Pay Journey (PAY),To Do,08/Oct/26 11:09 AM
+Epic 3: Payment Plan & Promise-to-Pay Journey (PAY),SCRUM-9,10040,Epic,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:13 AM,08/Oct/26 11:48 AM,08/Oct/26 11:48 AM,,,0,,,,,,,,,,,,,{},dark_blue,0|i0001t:,,,,,,,,,To Do,08/Oct/26 11:13 AM
+Story PAY-02: Single-Click Promise-to-Pay Capture,SCRUM-10,10041,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:14 AM,08/Oct/26 11:36 AM,08/Oct/26 11:36 AM,,,0,"*User Story:* As a customer unable to pay today, I want to select a future date when I promise to make a payment, so that I can prevent further escalation without phone friction.
+
+
+
+*Business Value:* Eliminates manual promise logging calls and tackles 'awaiting callback' queue stagnation (OPP-03).
+
+*Acceptance Criteria:* 
+
+*Given* an authenticated customer on the payment options screen,
+
+*When* they choose ""Promise to Pay Later"",
+
+*Then* a calendar picker allows selecting a payment date within a maximum 28-day window.
+
+*Given* a valid promise date selected,
+
+*When* confirmed by the customer,
+
+*Then* the system records the promise record in the Legacy Database and schedules an automated confirmation receipt.
+
+
+
+*Dependencies:* Epic 2, Legacy Collections Database Write API.
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i00026:,SCRUM Sprint 0,,,,,10040,SCRUM-9,Epic 3: Payment Plan & Promise-to-Pay Journey (PAY),To Do,08/Oct/26 11:14 AM
+Story RTE-01: Automated Hardship & Dispute Exit Gateway,SCRUM-11,10042,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:18 AM,08/Oct/26 11:35 AM,08/Oct/26 11:36 AM,,,0,"*User Story:* As a customer experiencing financial hardship or disputing a balance, I want the portal to recognize my situation and route me to a specialist, so that I receive human support.
+
+
+
+*Business Value:* Mitigates regulatory risk (CR-04) by keeping complex/vulnerable cases strictly representative-led.
+
+
+
+*Acceptance Criteria:*
+
+*Given* a customer selects ""Experiencing Financial Hardship"" or ""Dispute Balance"",
+
+*When* triggered, 
+
+*Then* self-service option selection is safely halted, and an explanatory transition screen is displayed. 
+
+*Given* the transition screen is acknowledged,
+
+*When* submitted,
+
+*Then* the portal creates an escalated task in the Specialist Representative Queue with a priority flag.
+
+
+
+*Dependencies:* Epic 2, Representative Task Queue Interface.
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i0002b:,SCRUM Sprint 0,,,,,10043,SCRUM-12,Epic 4: Routing & Exception Handling (RTE),To Do,08/Oct/26 11:18 AM
+Epic 4: Routing & Exception Handling (RTE),SCRUM-12,10043,Epic,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:22 AM,08/Oct/26 11:48 AM,08/Oct/26 11:47 AM,,,0,,,,,,,,,,,,,{},dark_teal,0|i0002n:,,,,,,,,,To Do,08/Oct/26 11:22 AM
+Story RTE-02: Context-Rich Representative Hand-Off,SCRUM-13,10044,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:23 AM,08/Oct/26 11:35 AM,08/Oct/26 11:42 AM,,,0,"*User Story:* As a Collections Representative, I want escalated or abandoned portal sessions to land in my queue with full interaction history attached, so that I do not make customers repeat information.
+
+
+
+*Business Value:* Directly resolves ADKAR Risk CR-02 and eliminates rep rejection of portal-routed cases (SN-108).
+
+
+
+*Acceptance Criteria:*
+
+*Given* any portal session routed to a representative (due to failed ID, hardship, dispute, or abandonment),
+
+*When* the task appears in the representative queue,
+
+*Then* it includes a payload containing: Portal Session ID, Authentication Status, Pages Viewed, Selected Options, and Exit Reason Code.
+
+
+
+*Dependencies:* RTE-01, VER-01.
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i0002r:,SCRUM Sprint 0,,,,,10043,SCRUM-12,Epic 4: Routing & Exception Handling (RTE),To Do,08/Oct/26 11:23 AM
+Story REP-01: Automated SMS/Email Confirmation Receipts,SCRUM-14,10045,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:42 AM,08/Oct/26 11:45 AM,08/Oct/26 11:43 AM,,,0,"*User Story:* As a customer completing a plan or promise, I want to receive an instant SMS and email receipt, so that I have written proof of my agreement.
+
+
+
+*Business Value:* Reinforces customer trust and eliminates repeat status check calls.
+
+
+
+*Acceptance Criteria:*
+
+*Given* a successfully saved payment plan or promise to pay,
+
+*When* the transaction writes to the database,
+
+*Then* the system triggers an outbound notification containing arrangement details, due dates, and portal reference link.
+
+
+
+*Dependencies:* PAY-01, PAY-02, Outbound Messaging Gateway.
+
+
+
+*Priority:* High",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i00032:,SCRUM Sprint 0,,,,,10046,SCRUM-15,Epic 5: Reporting & Audit Trail (REP),To Do,08/Oct/26 11:42 AM
+Epic 5: Reporting & Audit Trail (REP),SCRUM-15,10046,Epic,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:43 AM,08/Oct/26 11:43 AM,,,,0,,,,,,,,,,,,,{},dark_purple,0|i00035:,,,,,,,,,To Do,08/Oct/26 11:43 AM
+Story REP-02: Real-Time Operational Triage & Conversion Dashboard,SCRUM-16,10047,Task,To Do,SCRUM,Sigma-Team,software,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,Medium,,,,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,08/Oct/26 11:45 AM,08/Oct/26 11:47 AM,08/Oct/26 11:45 AM,,,0,"*User Story:* As a Collections Team Leader (Gareth Evans), I want a real-time dashboard showing portal conversion rates, routed case volumes, and context hand-off metrics, so that I can verify Phase 1 performance.
+
+
+
+*Business Value:* Provides operational observability and satisfies Priya's requirement for concrete management metrics.
+
+
+
+*Acceptance Criteria:*
+
+*Given* an Operations Manager viewing the reporting interface,
+
+*When* accessed,
+
+*Then* the dashboard displays: 1. Self-Service Conversion Rate (% eligible accounts resolved digitally), 2. Routed Case Volume by Reason Code (Hardship, Dispute, Failed 2FA), 3. Representative Context Attach Rate (% routed cases with complete logs).
+
+
+
+*Dependencies:* VIS-01, PAY-01, RTE-02.
+
+ 
+
+*Priority:* Medium",,Amaal Khandwalla,712020:4f6324d1-2f53-4054-ac9e-b23fd0759c24,,,,,,,,,{},,0|i0003f:,SCRUM Sprint 0,,,,,10046,SCRUM-15,Epic 5: Reporting & Audit Trail (REP),To Do,08/Oct/26 11:45 AM

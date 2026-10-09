@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PVC Check-in Kiosk Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="kiosk">
+    <header class="kiosk-header">
+      <span class="logo">Pritzki Veterinary Clinic</span>
+      <span class="tag">Self check-in</span>
+    </header>
+
+    <main>
+
+      <!-- 1. Welcome (default screen) -->
+      <section class="screen" id="welcome">
+        <div class="big-icon" aria-hidden="true">🐾</div>
+        <h1>Welcome. Ready to check in?</h1>
+        <p>It takes less than a minute. All you need is the phone number you booked with.</p>
+        <a class="btn" href="#phone">Start check-in</a>
+      </section>
+
+      <!-- 2. Phone lookup -->
+      <section class="screen" id="phone">
+        <h1>Enter your phone number</h1>
+        <p>Use the number we have on file for your booking.</p>
+        <input type="tel" inputmode="tel" placeholder="e.g. 0412 345 678" aria-label="Phone number">
+        <div class="btn-row">
+          <a class="btn secondary" href="#welcome">Back</a>
+          <!-- Prototype shortcut: a real kiosk would look this up -->
+          <a class="btn" href="#confirm">Look me up</a>
+        </div>
+      </section>
+
+      <!-- 3. Confirm pet and appointment -->
+      <section class="screen" id="confirm">
+        <h1>Is this your appointment?</h1>
+        <div class="card">
+          <dl>
+            <dt>Pet</dt><dd>Biscuit (Dog)</dd>
+            <dt>Time</dt><dd>Today, 10:30 am</dd>
+            <dt>Vet</dt><dd>Dr. Okafor</dd>
+          </dl>
+        </div>
+        <div class="btn-row">
+          <a class="btn secondary" href="#reception-mismatch">No, that's not right</a>
+          <a class="btn" href="#instructions">Yes, that's correct</a>
+        </div>
+      </section>
+
+      <!-- 4. Pre-appointment instructions -->
+      <section class="screen" id="instructions">
+        <h1>You're checked in</h1>
+        <p>Please follow these steps while you wait for Biscuit's appointment:</p>
+        <ol class="steps">
+          <li>Take a seat in the waiting area.</li>
+          <li>Keep your pet on a lead or in a carrier.</li>
+          <li>We'll call Biscuit's name when the vet is ready.</li>
+        </ol>
+        <a class="btn" href="#done">Done</a>
+      </section>
+
+      <!-- 5. Finished -->
+      <section class="screen" id="done">
+        <div class="big-icon" aria-hidden="true">✅</div>
+        <h1>Thank you!</h1>
+        <p>Please take a seat. We'll be with you shortly.</p>
+        <a class="btn secondary" href="#welcome">Next client</a>
+      </section>
+
+      <!-- Reception: no appointment today -->
+      <section class="screen" id="reception-none">
+        <div class="big-icon" aria-hidden="true">🙋</div>
+        <h1>Please speak to reception</h1>
+        <p>We couldn't find an appointment for today under that number. Our team will be happy to help.</p>
+        <div class="btn-row">
+          <a class="btn secondary" href="#phone">Try another number</a>
+          <a class="btn" href="#welcome">Start over</a>
+        </div>
+      </section>
+
+      <!-- Reception: client says details are wrong -->
+      <section class="screen" id="reception-mismatch">
+        <div class="big-icon" aria-hidden="true">🙋</div>
+        <h1>Please speak to reception</h1>
+        <p>Sorry about that. Our team will check your booking details with you.</p>
+        <div class="btn-row">
+          <a class="btn secondary" href="#phone">Try another number</a>
+          <a class="btn" href="#welcome">Start over</a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <aside class="proto-bar">
+    <strong>Prototype controls (not part of the kiosk):</strong>
+    <span>On the phone screen, the "Look me up" button simulates a number with an appointment today.</span>
+    <a href="#reception-none">Simulate: no appointment today</a>
+    <a href="#welcome">Reset</a>
+  </aside>
+
+</body>
+</html>

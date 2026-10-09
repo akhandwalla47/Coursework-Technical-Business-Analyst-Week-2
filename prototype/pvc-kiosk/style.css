@@ -1,0 +1,150 @@
+:root {
+  --brand: #0f6b5c;
+  --brand-dark: #0a4d42;
+  --accent: #f2b84b;
+  --bg: #eef5f3;
+  --ink: #1d2b28;
+  --muted: #5b6b67;
+  --warn-bg: #fff4e0;
+  --warn-ink: #7a4b00;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  background: #cfd8d6;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+}
+
+/* Kiosk frame */
+.kiosk {
+  width: 100%;
+  max-width: 900px;
+  min-height: 560px;
+  background: var(--bg);
+  border: 12px solid #2b3533;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kiosk-header .logo { font-size: 1.4rem; font-weight: 700; }
+.kiosk-header .tag { font-size: 1rem; opacity: 0.85; }
+
+main { flex: 1; display: flex; }
+
+/* Screen switching via :target, welcome is the default */
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding: 32px 48px;
+}
+.screen:target,
+body:not(:has(.screen:target)) #welcome { display: flex; }
+
+h1 { font-size: 2.2rem; margin: 0; }
+p { font-size: 1.2rem; margin: 0; max-width: 560px; line-height: 1.45; }
+.muted { color: var(--muted); font-size: 1rem; }
+
+/* Buttons are links so the prototype works without JavaScript */
+.btn {
+  display: inline-block;
+  min-width: 260px;
+  padding: 20px 32px;
+  border-radius: 14px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 3px solid var(--brand);
+}
+.btn:hover, .btn:focus-visible { background: var(--brand-dark); border-color: var(--brand-dark); outline: none; }
+.btn.secondary { background: #fff; color: var(--brand); }
+.btn.secondary:hover, .btn.secondary:focus-visible { background: #dcebe7; }
+.btn-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+input[type="tel"] {
+  width: 100%;
+  max-width: 420px;
+  padding: 18px 20px;
+  font-size: 1.8rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  border: 3px solid var(--brand);
+  border-radius: 14px;
+  background: #fff;
+}
+
+/* Confirmation card */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 40px;
+  text-align: left;
+  min-width: 380px;
+  border-left: 8px solid var(--accent);
+}
+.card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 24px; font-size: 1.3rem; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; font-weight: 600; }
+
+ol.steps {
+  text-align: left;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  max-width: 560px;
+  margin: 0;
+  padding-left: 28px;
+}
+ol.steps li { margin-bottom: 10px; }
+
+.notice {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+}
+
+.big-icon { font-size: 4rem; }
+
+/* Prototype-only controls, outside the kiosk frame */
+.proto-bar {
+  max-width: 900px;
+  width: 100%;
+  background: #fff;
+  border: 2px dashed #8a9a96;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.proto-bar strong { color: var(--muted); }
+.proto-bar a { color: var(--brand-dark); }
